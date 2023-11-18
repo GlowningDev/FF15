@@ -17,6 +17,8 @@ val r4jVersion = "2.3.0"
 dependencies {
     implementation("net.dv8tion:JDA:${jdaVersion}")
     implementation("com.github.stelar7:R4J:${r4jVersion}")
+
+    implementation(kotlin("reflect"))
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.8.10")
 }
 

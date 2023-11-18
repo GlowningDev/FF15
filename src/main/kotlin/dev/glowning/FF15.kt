@@ -1,7 +1,10 @@
 package dev.glowning
 
+import dev.glowning.commands.SummonerCommand
+import dev.glowning.commands.utils.CommandBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
+import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import no.stelar7.api.r4j.basic.APICredentials
 import no.stelar7.api.r4j.impl.R4J
 
@@ -30,5 +33,22 @@ class FF15 private constructor() {
     private fun init(discordToken: String, lolApiKey: String, tftApiKey: String) {
         discord = JDABuilder.createDefault(discordToken).build()
         riot = R4J(APICredentials(lolApiKey, null, tftApiKey, null, null))
+
+        val commands = listOf(
+            SummonerCommand()
+        )
+
+        commands.forEach { command ->
+            val annotation = command::class.annotations.find { it is CommandBuilder } as CommandBuilder
+            discord.addEventListener(command)
+            discord.upsertCommand(annotation.name, annotation.description)
+                .addOptions(
+                    annotation.optionsName.mapIndexed { index, name ->
+                        OptionData(annotation.optionsType[index], name, annotation.optionsDescription[index], annotation.optionsRequired[index])
+                    }
+                )
+                .queue()
+            println("Registered command ${annotation.name}")
+        }
     }
 }
